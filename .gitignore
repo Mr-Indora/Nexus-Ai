@@ -43,3 +43,6 @@ backend/backups/
 *.sqlite3
 *.db-*
 *.sqlite-*
+
+# Local database backups
+backend/nexus.db.backup-*
