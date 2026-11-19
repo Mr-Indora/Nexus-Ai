@@ -1,30 +1,73 @@
 # Nexus AI — Personal Intelligence Workspace
 
-Nexus ek personal workspace hai jo user ke apne Gmail, Google Calendar, Google Classroom aur Engineering College Ajmer notices ko ek jagah dikhata hai. Iska maqsad hai: **aaj kya zaroori hai, kaunsi deadline aa rahi hai, aur kaunsi nayi update dekhni chahiye** — ye jaldi samajhna.
+Nexus is a personal workspace that brings together the user's Gmail, Google Calendar, Google Classroom, and Government Engineering College Ajmer notices in one place.
 
-## Abhi kya milta hai
+Its primary objective is to help users quickly understand **what requires attention today, which deadlines are approaching, and which new updates they should review.**
 
-- **Home:** priorities, today's schedule, workload counts, recent mail aur synced study updates.
-- **Tasks & Goals:** manually task banana, email/source se nikle suggestions review karna, status aur deadline track karna.
-- **Insights:** source-backed email/thread, Classroom aur college notice analysis; unsupported data ko fact nahi maana jata.
-- **Connections:** Gmail/Calendar sync, Classroom permission/status, college notice check aur LinkedIn profile connection.
-- **Calendar:** Google events aur task deadlines ko Month/Week/Day views mein dekhna.
-- **Settings:** appearance, local notification preferences, account privacy aur consented AI provider check.
+## Current Features
 
-Nexus mein general-purpose chatbot/Ask Nexus screen ya email reply-draft feature nahi hai. Email dekhna, thread timeline, task extraction aur source analysis alag features ke roop mein kaam karte hain. Gemini optional hai; enabled consent ke bina personal source text Google ko nahi bheja jata. Rules-based features model unavailable hone par bhi chal sakte hain.
+- **Home:** Displays priorities, today's schedule, workload counts, recent emails, and synced study updates.
+- **Tasks & Goals:** Create tasks manually, review suggestions extracted from emails or other sources, and track their status and deadlines.
+- **Insights:** Provides source-backed analysis of emails, email threads, Classroom updates, and college notices. Unsupported information is never treated as factual.
+- **Connections:** Supports Gmail and Calendar synchronization, Classroom permission and connection status, college notice checks, and LinkedIn profile connections.
+- **Calendar:** Displays Google Calendar events and task deadlines through Month, Week, and Day views.
+- **Settings:** Provides appearance preferences, local notification settings, account privacy controls, and consent-based AI provider checks.
 
-## LinkedIn: kya connect hoga
+Nexus does not include a general-purpose chatbot, an Ask Nexus screen, or an email reply-drafting feature. Email viewing, thread timelines, task extraction, and source analysis operate as separate features.
 
-LinkedIn connector **Sign In with LinkedIn using OpenID Connect** ke supported scopes `openid`, `profile`, `email` maangta hai. Callback ID token ka signature, issuer, audience, expiry aur nonce validate karta hai; access token encrypted form mein save hota hai. Profile sync/status/disconnect account-scoped hain. LinkedIn page sidebar mein **LinkedIn** ke naam se professional hub deta hai aur returned profile snapshot (headline ho toh headline samet) dikhata hai.
+Gemini is optional. Personal source content is not sent to Google unless the user explicitly enables the required consent. Rules-based features continue to work even when an AI model is unavailable.
 
-Abhi available profile ke fields LinkedIn ke authorized OIDC response tak limited hain: member subject, name, optional headline, email/email verification, profile picture aur locale. Nexus unhe tabhi dikhata hai jab LinkedIn response mein de. LinkedIn messages, feed aur connections list current app permission se available nahi hain. LinkedIn ka Connections API first-degree connections ke liye `r_1st_connections` approval maangta hai; member posts ke liye restricted `r_member_social` approval chahiye. In APIs ke liye Nexus connector implementation bhi alag se karni hogi; professional hub is limit ko clearly dikhata hai aur fake network activity nahi banata. Refresh token LinkedIn sirf eligible approved apps ko de sakta hai; Nexus usse sirf response mein milne par store/use karta hai.
+## LinkedIn Integration: What Gets Connected
 
-### LinkedIn Developer Portal setup
+The LinkedIn connector uses **Sign In with LinkedIn using OpenID Connect** and requests the supported scopes:
 
-1. [LinkedIn Developer Portal](https://developer.linkedin.com/) mein apna existing `Nexus AI` app kholen ya zaroorat ho to app banayein. Koi company/page detail tabhi dein jab woh aapke liye sach ho. Verification, approval ya agreement aaye toh us step ko aap khud complete karein.
-2. App ke **Products** mein **Sign In with LinkedIn using OpenID Connect** request/enable karein; `openid`, `profile`, `email` scopes approve hone chahiye.
-3. Redirect URL bilkul ye register karein: `http://localhost:3000/api/auth/linkedin/callback`. HTTPS/prod environment mein apne actual host ka matching callback alag register karein.
-4. LinkedIn se mile Client ID aur Client Secret sirf `backend/.env` mein rakhein:
+- `openid`
+- `profile`
+- `email`
+
+The OAuth callback validates the ID token's signature, issuer, audience, expiry, and nonce. The access token is stored in encrypted form.
+
+Profile synchronization, connection status, and disconnection are scoped to the authenticated account.
+
+The LinkedIn page provides a professional hub in the Nexus sidebar under the name **LinkedIn**. It displays the returned profile snapshot, including the headline when available.
+
+### Currently Supported LinkedIn Profile Data
+
+Nexus is limited to the fields provided by LinkedIn's authorized OpenID Connect response:
+
+- Member subject identifier
+- Name
+- Optional professional headline
+- Email address and email verification status
+- Profile picture
+- Locale
+
+Nexus displays these fields only when LinkedIn includes them in its response.
+
+LinkedIn messages, feed content, and connections lists are not currently available through the application's existing permissions.
+
+Access to LinkedIn's Connections API requires approval for the `r_1st_connections` permission for first-degree connections. Access to member posts requires the restricted `r_member_social` permission.
+
+These APIs would also require separate connector implementation within Nexus. The professional hub clearly communicates these permission limitations and does not generate fake network activity.
+
+LinkedIn provides refresh tokens only to eligible approved applications. Nexus stores and uses a refresh token only when LinkedIn actually provides one in its response.
+
+### LinkedIn Developer Portal Setup
+
+1. Open the [LinkedIn Developer Portal](https://developer.linkedin.com/) and select your existing `Nexus AI` application, or create a new one if required. Provide company or page information only if it is accurate. Complete any verification, approval, or agreement steps yourself if requested.
+
+2. Under the application's **Products** section, request or enable **Sign In with LinkedIn using OpenID Connect**. The following scopes must be approved:
+   - `openid`
+   - `profile`
+   - `email`
+
+3. Register the following exact redirect URL:
+
+   `http://localhost:3000/api/auth/linkedin/callback`
+
+   For HTTPS or production environments, register a separate callback URL matching your actual deployment host.
+
+4. Store the Client ID and Client Secret received from LinkedIn only in `backend/.env`:
 
    ```dotenv
    LINKEDIN_CLIENT_ID=your-client-id
@@ -32,17 +75,25 @@ Abhi available profile ke fields LinkedIn ke authorized OIDC response tak limite
    LINKEDIN_REDIRECT_URI=http://localhost:3000/api/auth/linkedin/callback
    ```
 
-5. Backend restart karein. Google ke existing OAuth ID/secret ya redirect ko LinkedIn values se replace na karein.
+5. Restart the backend. Do not replace your existing Google OAuth Client ID, Client Secret, or redirect URI with LinkedIn credentials.
 
-OAuth web flow mein state cookie aur nonce use hote hain. LinkedIn ka documented PKCE route native loopback clients ke liye hai; Nexus existing confidential web-client callback use karta hai, isliye native-only endpoint ko web flow par nahi lagata.
+The OAuth web flow uses state cookies and a nonce.
 
-**Live LinkedIn authorization abhi prove nahi hua:** portal product approval, app credentials aur real OAuth callback ko account owner ke portal setup ke baad verify karna hoga. Agar LinkedIn company verification ya koi personal confirmation maange, user ko wahi manual step karna hai; Nexus fake information submit nahi karega.
+LinkedIn's documented PKCE flow is intended for native loopback clients. Nexus uses an existing confidential web-client callback, so the native-only endpoint is not applied to the web flow.
 
-## Local run — Windows / VS Code
+**Live LinkedIn authorization has not yet been verified.**
 
-Project ko localhost par chalayen. Is setup mein server doosre network devices ke liye expose nahi hota. Do VS Code terminals kholen.
+Actual product approval, application credentials, and a successful OAuth callback must be verified after the account owner completes the required setup in the LinkedIn Developer Portal.
 
-### Backend terminal
+If LinkedIn requests company verification or any personal confirmation, the user must complete that step manually. Nexus will never submit fabricated information.
+
+## Running Nexus AI Locally — Windows / VS Code
+
+Run the project locally using localhost. This configuration does not expose the servers to other devices on the network.
+
+Open two terminals in VS Code.
+
+### Backend Terminal
 
 ```powershell
 Set-Location D:\NexusRecovery\nexus-ai-project\backend
@@ -52,9 +103,11 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 .\.venv-local\Scripts\python.exe -m uvicorn main:app --reload --reload-exclude .venv-local --reload-exclude .venv --host 127.0.0.1 --port 8000
 ```
 
-`python` available na ho to VS Code Command Palette mein **Python: Create Environment** se installed Python 3.11+ chunein. Purana `.venv` kisi aur machine/path ka ho sakta hai; naya `.venv-local` use karein.
+If Python is not available through the `python` command, open the VS Code Command Palette and select **Python: Create Environment**, then choose an installed Python 3.11+ interpreter.
 
-### Frontend terminal
+An existing `.venv` may belong to another machine or project path. Use the newly created `.venv-local` environment.
+
+### Frontend Terminal
 
 ```powershell
 Set-Location D:\NexusRecovery\nexus-ai-project\frontend
@@ -62,67 +115,150 @@ npm ci
 npm run dev -- --hostname 127.0.0.1 --port 3000
 ```
 
-Chrome mein [http://localhost:3000](http://localhost:3000) kholen aur Google se sign in karein. Demo login sample data dikhata hai; real account ke sync ka proof nahi hai.
+Open [http://localhost:3000](http://localhost:3000) in Chrome and sign in with Google.
 
-## Environment setup
+Demo login displays sample data and does not prove that synchronization with a real account is working.
 
-`backend/.env.example` starter template hai. `backend/.env` local secrets ke liye hai aur source control mein commit nahi hona chahiye.
+## Environment Configuration
 
-- **Google:** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`. Google Cloud project mein Gmail, Calendar aur required Classroom APIs enabled hon. Google callback exactly `http://localhost:3000/api/auth/google/callback` ho.
-- **LinkedIn:** `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, `LINKEDIN_REDIRECT_URI` — upar diye LinkedIn callback se exact match.
-- **Gemini:** `GEMINI_API_KEY` server par; user account mein AI consent alag se on ho. Settings ka fixed connection check sirf `READY` test prompt bhejta hai, personal data nahi.
-- **Workspace:** `SECRET_KEY` local secret, `DATABASE_URL` legacy Nexus database, `TIMEZONE=Asia/Kolkata`, aur zaroorat par `PIDS_DATABASE_URL` / `PIDS_VAULT_DIR`.
+`backend/.env.example` is the starter configuration template.
 
-Koi token, API key, OAuth client secret, ya `.env` value chat, screenshot, frontend code ya Git mein paste na karein. Agar secret share ho chuka ho to provider portal mein rotate karein.
+`backend/.env` is intended for local secrets and must never be committed to source control.
 
-## Data aur sync kaise kaam karte hain
+### Google Integration
 
-- Gmail read-only scope se received mail fetch hoti hai; sync initial backfill ko batches mein resume karta hai. Sent, spam aur trash ko default action extraction se exclude kiya jata hai.
-- Calendar events read hote hain; event create/edit sirf user ke save action par Google Calendar mein likha jata hai. Calendar edit permission ke liye Google ko dobara authorize karna hota hai. Gmail, Classroom aur college notices read-only hain; Nexus email send, classwork submit ya grades change nahi karta.
-- College notices public official circular list se fetch hote hain. Last-success timestamps successful fetch par hi aage badhte hain; failed/never-checked states alag rehte hain.
-- Source suggestions pehle review ke liye aate hain; verified task banane ka faisla user karta hai.
-- LinkedIn token `SECRET_KEY` se derived Fernet encryption ke saath database mein store hota hai. Disconnect karne par Nexus ke LinkedIn profile/token row delete hote hain; provider-side grant revoke tabhi claim hota jab LinkedIn ka supported revoke action available ho.
-- Legacy Nexus database aur isolated PIDS database/vault alag hain. Database change se pehle exact path/revision check, verified backup aur disposable-copy rehearsal zaroor karein.
+Required environment variables:
 
-## Database update — existing data ko bachakar
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
 
-New schema head `0014_remove_discord_connection` hai. Migrations app start hote waqt khud apply nahi hoti. Existing database ko **backup aur disposable copy par rehearsal** ke baad hi upgrade karein. This migration removes the retired Discord connection table and its stored provider tokens; prior migration revisions remain in the chain so existing databases can upgrade safely. Retired chatbot history tables are preserved.
+Enable Gmail, Calendar, and the required Classroom APIs in your Google Cloud project.
 
-Backend terminal se:
+The Google callback must exactly match:
+
+`http://localhost:3000/api/auth/google/callback`
+
+### LinkedIn Integration
+
+Required environment variables:
+
+- `LINKEDIN_CLIENT_ID`
+- `LINKEDIN_CLIENT_SECRET`
+- `LINKEDIN_REDIRECT_URI`
+
+The redirect URI must exactly match the LinkedIn callback specified above.
+
+### Gemini Integration
+
+- `GEMINI_API_KEY` must be configured on the server.
+- AI consent must be separately enabled in the user's account.
+
+The fixed connection check in Settings sends only a `READY` test prompt and does not transmit personal data.
+
+### Workspace Configuration
+
+The workspace uses the following configuration variables:
+
+- `SECRET_KEY` — Local application secret.
+- `DATABASE_URL` — Legacy Nexus database.
+- `TIMEZONE=Asia/Kolkata`
+- `PIDS_DATABASE_URL` — Optional PIDS database configuration.
+- `PIDS_VAULT_DIR` — Optional PIDS vault directory.
+
+Never paste tokens, API keys, OAuth client secrets, or `.env` values into chats, screenshots, frontend code, or Git repositories.
+
+If a secret has already been shared or exposed, rotate it through the corresponding provider portal.
+
+## Data and Synchronization
+
+- **Gmail:** Received emails are fetched using read-only permissions. Initial backfill synchronization resumes in batches. Sent, spam, and trash folders are excluded from default task extraction.
+- **Google Calendar:** Events are read from Google Calendar. Event creation and editing are performed only after the user explicitly saves an action. Editing permissions require reauthorization with Google.
+- **Google Classroom:** Classroom data is read-only. Nexus does not submit classwork or modify grades.
+- **College Notices:** Notices are fetched from the official public circular listing. Last-success timestamps are updated only after successful fetches. Failed and never-checked states are tracked separately.
+- **Task Suggestions:** Suggestions extracted from sources are presented for review. The user decides whether to create a verified task.
+- **LinkedIn Token Storage:** LinkedIn tokens are stored in the database using Fernet encryption derived from `SECRET_KEY`. Disconnecting removes Nexus's local LinkedIn profile and token records. Provider-side authorization revocation is not claimed unless a supported LinkedIn revocation action is available.
+- **Database Separation:** The legacy Nexus database and the isolated PIDS database/vault are separate. Before making database changes, verify the exact path and revision, create a verified backup, and rehearse the operation on a disposable copy.
+
+## Database Upgrade — Preserving Existing Data
+
+The new schema head is:
+
+`0014_remove_discord_connection`
+
+Migrations are not automatically applied when the application starts.
+
+Always create a backup and rehearse the migration on a disposable database copy before upgrading an existing database.
+
+This migration removes the retired Discord connection table and its stored provider tokens. Previous migration revisions remain in the migration chain so existing databases can be upgraded safely.
+
+Retired chatbot history tables are preserved.
+
+Run the following command from the backend terminal:
 
 ```powershell
 Set-Location D:\NexusRecovery\nexus-ai-project\backend
 .\.venv-local\Scripts\python.exe -m alembic upgrade head
 ```
 
-Fresh database ke liye bhi isi migration chain se schema banta hai. PIDS database ke apne migrations alag hain; in legacy Nexus migrations se unhe migrate na karein.
+A fresh database is also initialized using the same migration chain.
 
-## API map
+PIDS has its own separate database migrations. Do not apply these legacy Nexus migrations to the PIDS database.
 
-- `GET /api/auth/linkedin/connect` — authenticated owner ke liye LinkedIn authorization start.
-- `GET /api/auth/linkedin/callback` — state/nonce, OIDC token validation, profile retrieval aur encrypted persistence.
-- `GET /api/linkedin/status` — safe connection/profile status; kabhi token nahi.
-- `POST /api/linkedin/sync` — current authorized basic profile refresh.
-- `DELETE /api/linkedin/connection` — current account ke local LinkedIn connection/token data remove.
-- `/linkedin` — frontend professional hub; profile snapshot/sync aur permission-gated network feature explanation.
-- Existing `/api/auth/google/*`, `/api/sync`, `/api/tasks`, `/api/emails`, `/api/events`, `/api/intelligence/*` routes Gmail/Calendar and workspace functions ke liye hain.
+## API Reference
 
-## Development checks
+| Endpoint | Description |
+|---|---|
+| `GET /api/auth/linkedin/connect` | Starts LinkedIn authorization for the authenticated account owner. |
+| `GET /api/auth/linkedin/callback` | Handles state and nonce validation, OIDC token validation, profile retrieval, and encrypted persistence. |
+| `GET /api/linkedin/status` | Returns safe connection and profile status without exposing tokens. |
+| `POST /api/linkedin/sync` | Refreshes the currently authorized basic LinkedIn profile. |
+| `DELETE /api/linkedin/connection` | Removes the current account's local LinkedIn connection and token data. |
+| `/linkedin` | Frontend professional hub for profile snapshots, synchronization, and permission-gated network feature explanations. |
 
-LinkedIn OAuth unit/integration behavior synthetic tokens and mocked provider responses se test kiya ja sakta hai; real product approval aur live provider authorization ka substitute nahi. Is checkout ke Next.js version ke framework-specific instructions `frontend/node_modules/next/dist/docs/` mein hote hain. Generated framework instruction files dev server dobara create kar sakta hai.
+Existing Google authentication and workspace endpoints:
+
+- `/api/auth/google/*`
+- `/api/sync`
+- `/api/tasks`
+- `/api/emails`
+- `/api/events`
+- `/api/intelligence/*`
+
+These routes support Gmail, Google Calendar, and workspace functionality.
+
+## Development Checks
+
+LinkedIn OAuth unit and integration behavior can be tested using synthetic tokens and mocked provider responses.
+
+These tests do not replace actual LinkedIn product approval or live provider authorization.
+
+Framework-specific instructions for the installed Next.js version are available in:
+
+`frontend/node_modules/next/dist/docs/`
+
+Generated framework instruction files may be recreated when the development server starts again.
+
+### Backend Tests
 
 ```powershell
 Set-Location D:\NexusRecovery\nexus-ai-project\backend
 .\.venv-local\Scripts\python.exe -m pytest -q
+```
 
+### Frontend Checks
+
+```powershell
 Set-Location D:\NexusRecovery\nexus-ai-project\frontend
 npm run lint
 npx tsc --noEmit --incremental false
 npm run build
 ```
 
-Ye checks local/mocked behavior verify karte hain, real Gmail, Classroom, LinkedIn ya Gemini account ka successful access prove nahi karte.
+These checks verify local and mocked application behavior. They do not prove successful access to real Gmail, Google Classroom, LinkedIn, or Gemini accounts.
 
 ## Architecture
 
-System ke components aur data flow: [ARCHITECTURE.md](ARCHITECTURE.md).
+For a detailed explanation of the system components and data flow, see:
+
+[ARCHITECTURE.md](ARCHITECTURE.md)
