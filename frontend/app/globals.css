@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F7F3EA;
+  --surface: #FFFDF8;
+  --surface-muted: #EEE8DC;
+  --border: rgba(70, 82, 70, 0.14);
+  --border-strong: rgba(70, 82, 70, 0.24);
+  --text: #24352B;
+  --text-muted: #68756C;
+  --text-faint: #8C978E;
+
+  --primary: #1F7A4D;
+  --primary-dim: rgba(31, 122, 77, 0.12);
+  --primary-hover: #17613C;
+
+  --high: #F07D86;
+  --high-bg: rgba(240, 125, 134, 0.13);
+  --med: #E8B45C;
+  --med-bg: rgba(232, 180, 92, 0.13);
+  --low: #46C98B;
+  --low-bg: rgba(70, 201, 139, 0.13);
+  --hero-glow-green: rgba(31, 122, 77, 0.2);
+  --hero-glow-gold: rgba(183, 139, 71, 0.18);
+
+  --cat-academic: #2A56E8;
+  --cat-admin: #C97A1A;
+  --cat-career: #1E9E6B;
+  --cat-info: #6B7280;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #101713;
+  --surface: #18221c;
+  --surface-muted: #222e26;
+  --border: rgba(190, 210, 195, 0.14);
+  --border-strong: rgba(190, 210, 195, 0.25);
+  --text: #e7efe9;
+  --text-muted: #b0beb4;
+  --text-faint: #89978d;
+
+  --primary: #69c991;
+  --primary-dim: rgba(105, 201, 145, 0.16);
+  --primary-hover: #83d9a6;
+
+  --high: #ff9298;
+  --high-bg: rgba(255, 146, 152, 0.14);
+  --med: #f1c36e;
+  --med-bg: rgba(241, 195, 110, 0.15);
+  --low: #68d9a0;
+  --low-bg: rgba(104, 217, 160, 0.14);
+  --hero-glow-green: rgba(77, 170, 112, 0.15);
+  --hero-glow-gold: rgba(183, 139, 71, 0.08);
+}
+
+:root:not([data-theme="dark"]) #appearance-light,
+:root[data-theme="dark"] #appearance-dark {
+  border-color: var(--primary);
+  background: var(--primary-dim);
+}
+
+:root:not([data-theme="dark"]) #appearance-light svg,
+:root[data-theme="dark"] #appearance-dark svg {
+  color: var(--primary);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+
+  --color-primary: var(--primary);
+  --color-primary-dim: var(--primary-dim);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-high: var(--high);
+  --color-high-bg: var(--high-bg);
+  --color-med: var(--med);
+  --color-med-bg: var(--med-bg);
+  --color-low: var(--low);
+  --color-low-bg: var(--low-bg);
+
+  --font-display: "Segoe UI Semibold", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
